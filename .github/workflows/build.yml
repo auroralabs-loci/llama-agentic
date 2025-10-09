@@ -52,14 +52,4 @@ jobs:
                 build/bin/libggml-cpu.so
                 build/bin/libggml-base.so
           project: Llama CPP
-
-      - name: LOCI Summary
-        uses: auroralabs-loci/loci-dev-action@main
-        env:
-          LOCI_API_KEY: ${{ secrets.DEV_API_KEY }}
-          LOCI_BACKEND_URL: ${{ vars.DEV_BE_URL }}
-          LOCI_GITHUB_TOKEN: ${{ secrets.LOCI_GITHUB_TOKEN }} 
-        with:
-          mode: summary
-          project: Llama CPP
       
