@@ -15,7 +15,7 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-    environment: 'prod_auroralabs_agentic'
+    environment: 'prod_auroralabs_std'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
