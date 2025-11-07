@@ -8,6 +8,7 @@ on:
 
 env:
   LOCI_PROJECT: MM_arm64
+
   LOCI_API_KEY: '${{ secrets.LOCI_API_KEY }}'
   LOCI_BACKEND_URL: '${{ vars.LOCI_BACKEND_URL }}'
 
@@ -15,7 +16,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
     environment: 'prod_auroralabs_agentic'
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -46,6 +46,7 @@ jobs:
 
       - name: Upload build artifacts
         uses: auroralabs-loci/loci-action@v1
+
         with:
           mode: upload
           binaries: |
@@ -54,3 +55,4 @@ jobs:
                 build/bin/libggml-cpu.so
                 build/bin/libggml-base.so
           project: MM_arm64
+
