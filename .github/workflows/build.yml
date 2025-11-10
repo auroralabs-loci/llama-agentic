@@ -65,7 +65,3 @@ jobs:
         with:
           mode: summary
           project: Llama CPP
-          
-
-          
-      
