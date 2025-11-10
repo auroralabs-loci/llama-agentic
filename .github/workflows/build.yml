@@ -46,7 +46,7 @@ jobs:
           cmake --build . --target llama -j4
 
       - name: Upload build artifacts
-        uses: auroralabs-loci/loci-dev-action@main
+        uses: auroralabs-loci/loci-action@v1.0.1
         with:
           mode: upload
           binaries: |
