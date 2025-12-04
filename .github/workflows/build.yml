@@ -54,7 +54,7 @@ jobs:
                 build/bin/libllama.so
                 build/bin/libggml-cpu.so
                 build/bin/libggml-base.so
-          project: Llama CPP
+          project: MM_LlamaCPP
           
 
           
