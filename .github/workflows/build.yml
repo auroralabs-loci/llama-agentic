@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 env:
-  LOCI_PROJECT: MM_LlamaCPP
+  LOCI_PROJECT: summary_test_marko_llama_cpp
   LOCI_API_KEY: '${{ secrets.LOCI_API_KEY }}'
   LOCI_BACKEND_URL: '${{ vars.LOCI_BACKEND_URL }}'
 
@@ -54,7 +54,7 @@ jobs:
                 build/bin/libllama.so
                 build/bin/libggml-cpu.so
                 build/bin/libggml-base.so
-          project: MM_LlamaCPP
+          project: summary_test_marko_llama_cpp
           
 
           
