@@ -1,5 +1,4 @@
 name: Build Project
-
 on:
   pull_request:
     branches: ["**"]
@@ -15,7 +14,7 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-    environment: 'dev_auroralabs_std'
+    environment: 'dev_auroralabs_agentic'
 
     steps:
       - name: Checkout code
