@@ -54,6 +54,3 @@ jobs:
                 build/bin/libggml-cpu.so
                 build/bin/libggml-base.so
           project: MM-ARM
-          
-
-          
