@@ -1,5 +1,4 @@
 name: Build Project
-
 on:
   pull_request:
     branches: ["**"]
@@ -15,7 +14,7 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-    environment: 'prod_auroralabs_std'
+    environment: 'prod_auroralabs_agentic'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -45,7 +44,7 @@ jobs:
           cmake --build . --target llama -j4
 
       - name: Upload build artifacts
-        uses: auroralabs-loci/loci-dev-action@main
+        uses: auroralabs-loci/loci-action@v1
         with:
           mode: upload
           binaries: |
