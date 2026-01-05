@@ -45,7 +45,6 @@ jobs:
 
       - name: Upload build artifacts
         uses: auroralabs-loci/loci-dev-action@main
-
         with:
           mode: upload
           binaries: |
@@ -54,3 +53,5 @@ jobs:
                 build/bin/libggml-cpu.so
                 build/bin/libggml-base.so
           project: MM-ARM
+
+
