@@ -62,4 +62,4 @@ jobs:
           LOCI_GITHUB_TOKEN: ${{ secrets.LOCI_GITHUB_TOKEN }}
         with:
           mode: summary
-          project: ${{ env.LOCI_PROJECT }}
+          project: ${{ env.LOCI_PROJECT }
