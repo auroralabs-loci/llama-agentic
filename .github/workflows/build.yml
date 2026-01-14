@@ -14,7 +14,7 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-    environment: 'dev_auroralabs_agentic'
+    environment: 'prod_auroralabs_agentic'
 
     steps:
       - name: Checkout code
@@ -45,7 +45,7 @@ jobs:
           cmake --build . --target llama -j4
 
       - name: Upload build artifacts
-        uses: auroralabs-loci/loci-dev-action@main
+        uses: auroralabs-loci/loci-action@v1
         with:
           mode: upload
           binaries: |
@@ -56,7 +56,7 @@ jobs:
           project: MM-ARM
 
       - name: LOCI Summary
-        uses: auroralabs-loci/loci-dev-action@main
+        uses: auroralabs-loci/loci-action@v1
         env:
           LOCI_API_KEY: '${{ secrets.LOCI_API_KEY }}'
           LOCI_BACKEND_URL: '${{ vars.LOCI_BACKEND_URL }}'
