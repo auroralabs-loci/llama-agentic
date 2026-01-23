@@ -6,10 +6,16 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+    
+env:
+  LOCI_PROJECT: MM_arm64
+  LOCI_API_KEY: '${{ secrets.LOCI_API_KEY }}'
+  LOCI_BACKEND_URL: '${{ vars.LOCI_BACKEND_URL }}'
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    environment: 'prod_auroralabs_agentic'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -40,9 +46,6 @@ jobs:
 
       - name: Upload build artifacts
         uses: auroralabs-loci/loci-action@v1
-        env:
-          LOCI_BACKEND_URL: '${{ vars.LOCI_PROD_BACKEND_URL }}'
-          LOCI_API_KEY: '${{ secrets.LOCI_PROD_AGENTIC_API_KEY }}'
         with:
           mode: upload
           binaries: |
