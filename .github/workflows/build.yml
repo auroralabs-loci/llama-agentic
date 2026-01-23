@@ -45,6 +45,9 @@ jobs:
 
       - name: Upload build artifacts
         uses: auroralabs-loci/loci-action@v1
+        env:
+          LOCI_BACKEND_URL: '${{ vars.LOCI_PROD_BACKEND_URL }}'
+          LOCI_API_KEY: '${{ secrets.LOCI_PROD_AGENTIC_API_KEY }}'
         with:
           mode: upload
           binaries: |
@@ -52,4 +55,3 @@ jobs:
                 build/bin/libllama.so
                 build/bin/libggml-cpu.so
                 build/bin/libggml-base.so
-          project: MM_arm64
