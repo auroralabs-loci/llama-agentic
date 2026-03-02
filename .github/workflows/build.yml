@@ -15,6 +15,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     environment: 'dev_auroralabs_agentic'
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -52,3 +53,4 @@ jobs:
                 build/bin/libllama.so
                 build/bin/libggml-cpu.so
                 build/bin/libggml-base.so
+          project: MM_arm64
