@@ -143,12 +143,14 @@ class LazyBase(ABC, metaclass=LazyMeta):
                 # share the evaluation between lazy tuple elements
                 shared_args: list = [args, None]
 
-                def eager_tuple_element(a: list[Any], i: int = 0, /, **kw) -> LazyBase:
-                    assert len(a) == 2
-                    if a[1] is None:
-                        a[1] = fn(*a[0], **kw)
-                    return a[1][i]
-                return tuple(cls(meta=cls.eager_to_meta(res[i]), args=(shared_args, i), kwargs=kwargs, func=eager_tuple_element) for i in range(len(res)))
+                def make_tuple_evaluator(idx: int) -> Callable:
+                    def evaluate_element(a: list[Any], /, **kw) -> Any:
+                        assert len(a) == 2
+                        if a[1] is None:
+                            a[1] = fn(*a[0], **kw)
+                        return a[1][idx]
+                    return evaluate_element
+                return tuple(cls(meta=cls.eager_to_meta(res[i]), args=(shared_args,), kwargs=kwargs, func=make_tuple_evaluator(i)) for i in range(len(res)))
             else:
                 del res  # not needed
                 # non-tensor return likely relies on the contents of the args
