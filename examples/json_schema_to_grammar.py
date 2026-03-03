@@ -31,19 +31,17 @@ def _generate_min_max_int(min_value: Optional[int], max_value: Optional[int], ou
     has_min = min_value != None
     has_max = max_value != None
 
-    def digit_range(from_char: str, to_char: str):
+    def append_range_class(from_char: str, to_char: str):
         out.append("[")
-        if from_char == to_char:
-            out.append(from_char)
-        else:
-            out.append(from_char)
+        out.append(from_char)
+        if from_char != to_char:
             out.append("-")
             out.append(to_char)
         out.append("]")
 
-    def more_digits(min_digits: int, max_digits: int):
+    def append_repeat_digits(min_digits: int, max_digits: int):
         out.append("[0-9]")
-        if min_digits == max_digits and min_digits == 1:
+        if min_digits == max_digits == 1:
             return
         out.append("{")
         out.append(str(min_digits))
@@ -74,9 +72,9 @@ def _generate_min_max_int(min_value: Optional[int], max_value: Optional[int], ou
                 to_reached = False
                 out.append("(")
                 if from_sub == sub_zeros:
-                    digit_range(from_str[i], chr(ord(to_str[i]) - 1))
+                    append_range_class(from_str[i], chr(ord(to_str[i]) - 1))
                     out.append(" ")
-                    more_digits(sub_len, sub_len)
+                    append_repeat_digits(sub_len, sub_len)
                 else:
                     out.append("[")
                     out.append(from_str[i])
@@ -87,15 +85,15 @@ def _generate_min_max_int(min_value: Optional[int], max_value: Optional[int], ou
                     if ord(from_str[i]) < ord(to_str[i]) - 1:
                         out.append(" | ")
                         if to_sub == sub_nines:
-                            digit_range(chr(ord(from_str[i]) + 1), to_str[i])
+                            append_range_class(chr(ord(from_str[i]) + 1), to_str[i])
                             to_reached = True
                         else:
-                            digit_range(chr(ord(from_str[i]) + 1), chr(ord(to_str[i]) - 1))
+                            append_range_class(chr(ord(from_str[i]) + 1), chr(ord(to_str[i]) - 1))
                         out.append(" ")
-                        more_digits(sub_len, sub_len)
+                        append_repeat_digits(sub_len, sub_len)
                 if not to_reached:
                     out.append(" | ")
-                    digit_range(to_str[i], to_str[i])
+                    append_range_class(to_str[i], to_str[i])
                     out.append(" ")
                     uniform_range(sub_zeros, to_sub)
                 out.append(")")
@@ -138,50 +136,50 @@ def _generate_min_max_int(min_value: Optional[int], max_value: Optional[int], ou
             out.append("\"-\" (")
             _generate_min_max_int(None, -min_value, out, decimals_left, top_level=False)
             out.append(") | [0] | [1-9] ")
-            more_digits(0, decimals_left - 1)
+            append_repeat_digits(0, decimals_left - 1)
         elif min_value == 0:
             if top_level:
                 out.append("[0] | [1-9] ")
-                more_digits(0, less_decimals)
+                append_repeat_digits(0, less_decimals)
             else:
-                more_digits(1, decimals_left)
+                append_repeat_digits(1, decimals_left)
         elif min_value <= 9:
             c = str(min_value)
             range_start = '1' if top_level else '0'
             if c > range_start:
-                digit_range(range_start, chr(ord(c) - 1))
+                append_range_class(range_start, chr(ord(c) - 1))
                 out.append(" ")
-                more_digits(1, less_decimals)
+                append_repeat_digits(1, less_decimals)
                 out.append(" | ")
-            digit_range(c, "9")
+            append_range_class(c, "9")
             out.append(" ")
-            more_digits(0, less_decimals)
+            append_repeat_digits(0, less_decimals)
         else:
             min_s = str(min_value)
             length = len(min_s)
             c = min_s[0]
 
             if c > "1":
-                digit_range("1" if top_level else "0", chr(ord(c) - 1))
+                append_range_class("1" if top_level else "0", chr(ord(c) - 1))
                 out.append(" ")
-                more_digits(length, less_decimals)
+                append_repeat_digits(length, less_decimals)
                 out.append(" | ")
-            digit_range(c, c)
+            append_range_class(c, c)
             out.append(" (")
             _generate_min_max_int(int(min_s[1:]), None, out, less_decimals, top_level=False)
             out.append(")")
             if c < "9":
                 out.append(" | ")
-                digit_range(chr(ord(c) + 1), "9")
+                append_range_class(chr(ord(c) + 1), "9")
                 out.append(" ")
-                more_digits(length - 1, less_decimals)
+                append_repeat_digits(length - 1, less_decimals)
         return
 
     if has_max:
         if max_value >= 0:
             if top_level:
                 out.append("\"-\" [1-9] ")
-                more_digits(0, less_decimals)
+                append_repeat_digits(0, less_decimals)
                 out.append(" | ")
             _generate_min_max_int(0, max_value, out, decimals_left, top_level=True)
         else:
@@ -427,13 +425,21 @@ class SchemaConverter:
             # (GBNF's syntax is luckily very close to regular expressions!)
             seq: list[tuple[str, bool]] = []
 
-            def get_dot():
-                if self._dotall:
-                    rule = DOTALL
-                else:
-                    # Accept any character... except \n and \r line break chars (\x0A and \xOD)
-                    rule = DOT
-                return self._add_rule(f'dot', rule)
+            def extract_bracket_class() -> str:
+                nonlocal i
+                bracket_expr = pattern[i]  # opening '['
+                i += 1
+                while i < length and pattern[i] != ']':
+                    if pattern[i] == '\\':
+                        bracket_expr += pattern[i:i+2]
+                        i += 2
+                    else:
+                        bracket_expr += pattern[i]
+                        i += 1
+                assert i < length, f'Unbalanced square brackets; start = {start}, i = {i}, pattern = {pattern}'
+                bracket_expr += ']'
+                i += 1
+                return bracket_expr
 
             def join_seq():
                 nonlocal seq
@@ -450,7 +456,8 @@ class SchemaConverter:
             while i < length:
                 c = pattern[i]
                 if c == '.':
-                    seq.append((get_dot(), False))
+                    dot_rule = DOTALL if self._dotall else DOT
+                    seq.append((self._add_rule('dot', dot_rule), False))
                     i += 1
                 elif c == '(':
                     i += 1
@@ -462,19 +469,7 @@ class SchemaConverter:
                     assert start > 0 and pattern[start-1] == '(', f'Unbalanced parentheses; start = {start}, i = {i}, pattern = {pattern}'
                     return join_seq()
                 elif c == '[':
-                    square_brackets = c
-                    i += 1
-                    while i < length and pattern[i] != ']':
-                        if pattern[i] == '\\':
-                            square_brackets += pattern[i:i+2]
-                            i += 2
-                        else:
-                            square_brackets += pattern[i]
-                            i += 1
-                    assert i < length, f'Unbalanced square brackets; start = {start}, i = {i}, pattern = {pattern}'
-                    square_brackets += ']'
-                    i += 1
-                    seq.append((square_brackets, False))
+                    seq.append((extract_bracket_class(), False))
                 elif c == '|':
                     seq.append(('|', False))
                     i += 1

@@ -272,18 +272,22 @@ def run(
                 for i in range(n):
                     start_time = time.time()
 
-                    def elapsed():
-                        return time.time() - start_time
+                    def track_test_result(success: bool):
+                        elapsed = time.time() - start_time
+                        if success:
+                            success_times.append(elapsed)
+                        else:
+                            failure_times.append(elapsed)
 
                     try:
                         test(server)
-                        success_times.append(elapsed())
+                        track_test_result(True)
                         success_count += 1
                         logger.info('success')
                     except Exception as e:
                         logger.error(f'failure: {e}')
                         failure_count += 1
-                        failure_times.append(elapsed())
+                        track_test_result(False)
                         failures.append(str(e))
                         # import traceback
                         # traceback.print_exc()
